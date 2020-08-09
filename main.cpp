@@ -3,6 +3,11 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <csignal>
+
+#include "debug.h"
+#include "vertex_buffer.h"
+#include "index_buffer.h"
 
 using namespace std;
 
@@ -79,6 +84,7 @@ int main() {
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    // core profile requires us to create a vertex object array, If we're to resign from it, we need compat profile
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
@@ -90,37 +96,78 @@ int main() {
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+
+    // synchronize with vsync/refresh rate
+    glfwSwapInterval(1);
+
     if (glewInit() != GLEW_OK)
         cout << "error" << endl;
 
+    // glew has to be initialized first for it to work
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(GLDebugMessageCallback, nullptr);
+
+    // print gl version
     cout << glGetString(GL_VERSION) << endl;
 
+    float positions[] = {
+            -0.5f, -0.5f,
+            0.5f, -0.5f,
+            0.5f, 0.5f,
+            -0.5f, 0.5f,
+    };
+
+    unsigned int indices[] = {
+            0, 1, 2,
+            2, 3, 0
+    };
+
+//    // vertex array object, If it won't work for some reason, switch to older glGenVertexArrays
     GLuint vao = 0;
     glCreateVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-    float positions[6] = {
-            -0.5f, -0.5f,
-            0.5f, -0.5f,
-            0.0f, 0.5f,
-    };
-    unsigned int buffer;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
+    VertexBuffer vb(positions, 4 * 2 * sizeof(float));
+
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, nullptr);
+
+    IndexBuffer ib(indices, 6);
 
     ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
     unsigned int shader = createShader(source.VertexSource, source.FragmentSource);
     glUseProgram(shader);
 
+    int location = glGetUniformLocation(shader, "u_Color");
+    ASSERT(location != -1)
+
+    glBindVertexArray(0);
+    glUseProgram(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    float r = 0.0f;
+    float increment = 0.05f;
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glUseProgram(shader);
+        glUniform4f(location, r, 0.3f, 0.8f, 1.0f);
+
+        glBindVertexArray(vao);
+        ib.Bind();
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+        if (r > 1.0f)
+            increment = -0.05f;
+        else if (r < 0.0f)
+            increment = 0.05f;
+
+        r += increment;
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
