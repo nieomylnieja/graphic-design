@@ -6,8 +6,8 @@
 #include <csignal>
 
 #include "debug.h"
-#include "vertex_buffer.h"
 #include "index_buffer.h"
+#include "vertex_array.h"
 
 using namespace std;
 
@@ -124,14 +124,16 @@ int main() {
     };
 
 //    // vertex array object, If it won't work for some reason, switch to older glGenVertexArrays
-    GLuint vao = 0;
+    unsigned int vao = 0;
     glCreateVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
+    VertexArray va;
     VertexBuffer vb(positions, 4 * 2 * sizeof(float));
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, nullptr);
+    VertexBufferLayout layout;
+    layout.Push<float>(2);
+    va.AddBuffer(vb, layout);
 
     IndexBuffer ib(indices, 6);
 
@@ -157,7 +159,7 @@ int main() {
         glUseProgram(shader);
         glUniform4f(location, r, 0.3f, 0.8f, 1.0f);
 
-        glBindVertexArray(vao);
+        va.Bind();
         ib.Bind();
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);

@@ -14,6 +14,6 @@ find_package (glfw3 REQUIRED)
 find_package (glm REQUIRED)
 find_package (GLEW REQUIRED STATIC)
 
-set(SOURCE_FILES main.cpp debug.h debug.cpp index_buffer.cpp index_buffer.h vertex_buffer.cpp vertex_buffer.h)
+set(SOURCE_FILES main.cpp debug.h debug.cpp index_buffer.cpp index_buffer.h vertex_buffer.cpp vertex_buffer.h vertex_array.cpp vertex_array.h vertex_buffer_layout.h)
 add_executable(graphic_design ${SOURCE_FILES})
 target_link_libraries(graphic_design GL GLU GLEW glfw3 Xxf86vm pthread Xrandr Xinerama Xi X11 Xcursor)

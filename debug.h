@@ -1,4 +1,3 @@
-// Header for GLDebugMessageCallback
 #pragma once
 
 #include <iostream>
