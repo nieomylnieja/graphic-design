@@ -26,6 +26,6 @@ void VertexArray::Bind() const {
     glBindVertexArray(m_RendererID);
 }
 
-void VertexArray::Unbind() const {
-    glBindVertexArray(m_RendererID);
+void VertexArray::Unbind() {
+    glBindVertexArray(0);
 }
