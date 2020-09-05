@@ -14,10 +14,11 @@ find_package (glfw3 REQUIRED)
 find_package (glm REQUIRED)
 find_package (GLEW REQUIRED STATIC)
 
-set(SOURCE_FILES main.cpp debug.h debug.cpp index_buffer.cpp index_buffer.h vertex_buffer.cpp vertex_buffer.h vertex_array.cpp vertex_array.h vertex_buffer_layout.h shader.cpp shader.h renderer.cpp renderer.h Texture.cpp Texture.h)
+set(SOURCE_FILES main.cpp debug.h debug.cpp index_buffer.cpp index_buffer.h vertex_buffer.cpp vertex_buffer.h vertex_array.cpp vertex_array.h vertex_buffer_layout.h shader.cpp shader.h renderer.cpp renderer.h Texture.cpp Texture.h lib/glad/glad.c)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} GL GLU GLEW glfw3 Xxf86vm pthread Xrandr Xinerama Xi X11 Xcursor)
 
 add_subdirectory(lib/spdlog)
 
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog)
+

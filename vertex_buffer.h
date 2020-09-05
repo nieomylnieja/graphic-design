@@ -1,5 +1,3 @@
-#include <GL/glew.h>
-
 class VertexBuffer {
 private:
     unsigned int m_RendererID{};

@@ -1,5 +1,7 @@
+//#include "lib/glad/glad.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
 #include <iostream>
 #include <spdlog/spdlog.h>
 
@@ -23,9 +25,20 @@ void initializeGLFW() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 }
 
-int main() {
-    initializeGLFW();
+//void initializeGLAD() {
+//    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+//        spdlog::error("Failed to initialize GLAD");
+//        exit(1);
+//    }
+//}
 
+void EnableGLDebug() {
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(GLDebugMessageCallback, nullptr);
+}
+
+GLFWwindow *initializeWindow() {
     GLFWwindow *window;
 
     /* Create a windowed mode window and its OpenGL context */
@@ -33,22 +46,35 @@ int main() {
     if (!window) {
         spdlog::error("Failed to create GLFW window");
         glfwTerminate();
-        return -1;
+        exit(1);
     }
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+    return window;
+}
+
+void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+    glViewport(0, 0, width, height);
+}
+
+int main() {
+    initializeGLFW();
+
+    GLFWwindow *window = initializeWindow();
 
     // synchronize with vsync/refresh rate
     glfwSwapInterval(1);
 
+//    initializeGLAD();
     if (glewInit() != GLEW_OK)
         std::cout << "error" << std::endl;
 
     // glew has to be initialized first for it to work
-    glEnable(GL_DEBUG_OUTPUT);
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    glDebugMessageCallback(GLDebugMessageCallback, nullptr);
+    EnableGLDebug();
+
+    glViewport(0, 0, 800, 600);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // print gl version
     std::cout << glGetString(GL_VERSION) << std::endl;
@@ -67,11 +93,6 @@ int main() {
 
 //    glBlendFunc(GL_SRC0_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //    glEnable(GL_BLEND);
-//
-////    // vertex array object, If it won't work for some reason, switch to older glGenVertexArrays
-//    unsigned int vao = 0;
-//    glCreateVertexArrays(1, &vao);
-//    glBindVertexArray(vao);
 
     VertexArray va;
     VertexBuffer vb(positions, 4 * 4 * sizeof(float));
