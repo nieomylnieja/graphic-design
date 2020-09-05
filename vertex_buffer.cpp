@@ -1,6 +1,5 @@
 #include "vertex_buffer.h"
-#include <GL/glew.h>
-//#include "lib/glad/glad.h"
+#include "lib/glad/glad.h"
 
 VertexBuffer::VertexBuffer(const void *data, unsigned int size) {
     glGenBuffers(1, &m_RendererID);

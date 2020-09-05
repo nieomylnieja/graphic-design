@@ -1,5 +1,4 @@
-//#include "lib/glad/glad.h"
-#include <GL/glew.h>
+#include "lib/glad/glad.h"
 #include <GLFW/glfw3.h>
 
 #include <iostream>
@@ -25,12 +24,12 @@ void initializeGLFW() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 }
 
-//void initializeGLAD() {
-//    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-//        spdlog::error("Failed to initialize GLAD");
-//        exit(1);
-//    }
-//}
+void initializeGLAD() {
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+        spdlog::error("Failed to initialize GLAD");
+        exit(1);
+    }
+}
 
 void EnableGLDebug() {
     glEnable(GL_DEBUG_OUTPUT);
@@ -51,6 +50,8 @@ GLFWwindow *initializeWindow() {
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+    // synchronize with vsync/refresh rate
+    glfwSwapInterval(1);
     return window;
 }
 
@@ -62,81 +63,19 @@ int main() {
     initializeGLFW();
 
     GLFWwindow *window = initializeWindow();
-
-    // synchronize with vsync/refresh rate
-    glfwSwapInterval(1);
-
-//    initializeGLAD();
-    if (glewInit() != GLEW_OK)
-        std::cout << "error" << std::endl;
-
-    // glew has to be initialized first for it to work
+    initializeGLAD();
+    // glew/glad has to be initialized first for it to work
     EnableGLDebug();
 
     glViewport(0, 0, 800, 600);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // print gl version
-    std::cout << glGetString(GL_VERSION) << std::endl;
+    spdlog::info(glGetString(GL_VERSION));
 
-    float positions[] = {
-            -0.5f, -0.5f, 0.0f, 0.0f,
-            0.5f, -0.5f, 1.0f, 0.0f,
-            0.5f, 0.5f, 1.0f, 1.0f,
-            -0.5f, 0.5f, 0.0f, 1.0f
-    };
-
-    unsigned int indices[] = {
-            0, 1, 2,
-            2, 3, 0
-    };
-
-//    glBlendFunc(GL_SRC0_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//    glEnable(GL_BLEND);
-
-    VertexArray va;
-    VertexBuffer vb(positions, 4 * 4 * sizeof(float));
-
-    VertexBufferLayout layout;
-    layout.Push<float>(2);
-    layout.Push<float>(2);
-    va.AddBuffer(vb, layout);
-
-    IndexBuffer ib(indices, 6);
-
-    Shader shader("res/shaders/Basic.shader");
-    shader.Bind();
-    shader.SetUniform4f("u_Color", std::vector<float>{0.8f, 0.3f, 0.8f, 1.0f});
-
-    Texture texture("res/textures/test.png");
-    texture.Bind();
-    shader.SetUniform1i("u_Texture", 0);
-
-    VertexArray::Unbind();
-    VertexBuffer::Unbind();
-    IndexBuffer::Unbind();
-    Shader::Unbind();
-
-    Renderer renderer;
-
-    float r = 0.0f;
-    float increment = 0.05f;
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
         /* Render here */
-        Renderer::Clear();
-
-        shader.Bind();
-        shader.SetUniform4f("u_Color", std::vector<float>{r, 0.3f, 0.8f, 1.0f});
-
-        renderer.Draw(va, ib, shader);
-
-        if (r > 1.0f)
-            increment = -0.05f;
-        else if (r < 0.0f)
-            increment = 0.05f;
-
-        r += increment;
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
