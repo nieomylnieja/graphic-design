@@ -33,5 +33,7 @@ public:
     static void Unbind();
 
     // Set uniforms
-    void SenUniform4f(const std::string &name, const std::vector<float> &v);
+    void SetUniform1i(const std::string &name, int v);
+
+    void SetUniform4f(const std::string &name, const std::vector<float> &v);
 };

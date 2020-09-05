@@ -34,10 +34,6 @@ void Shader::Unbind() {
     glUseProgram(0);
 }
 
-void Shader::SenUniform4f(const std::string &name, const std::vector<float> &v) {
-    glUniform4f(getUniformLocation(name), v[0], v[1], v[2], v[4]);
-}
-
 ShaderProgramSource Shader::parse(const std::string &filepath) {
     std::ifstream stream(filepath);
 
@@ -97,4 +93,12 @@ unsigned int Shader::create(const std::string &vertexShader, const std::string &
     glDeleteShader(fs);
 
     return program;
+}
+
+void Shader::SetUniform1i(const std::string &name, int v) {
+    glUniform1i(getUniformLocation(name), v);
+}
+
+void Shader::SetUniform4f(const std::string &name, const std::vector<float> &v) {
+    glUniform4f(getUniformLocation(name), v[0], v[1], v[2], v[4]);
 }

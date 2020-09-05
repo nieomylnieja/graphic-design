@@ -16,6 +16,7 @@
 // contexts but isn't necessary for our simple use case.
 // glDebugMessageCallback(GLDebugMessageCallback, nullptr);
 
+#include <spdlog/spdlog.h>
 #include "debug.h"
 
 // Callback function for printing debug statements
@@ -109,7 +110,7 @@ void GLDebugMessageCallback(GLenum source, GLenum type, GLuint id,
     }
 
     if (_severity != "NOTIFICATION") {
-        printf("OpenGL error [%d]: %s of %s severity, raised from %s: %s\n",
+        spdlog::error("OpenGL error [{}]: {} of {} severity, raised from {}: {}\n",
                id, _type, _severity, _source, msg);
     }
 }
