@@ -5,7 +5,7 @@
 // Enable the debugging layer of OpenGL
 //
 // GL_DEBUG_OUTPUT - Faster version but not useful for breakpoints
-// GL_DEBUG_OUTPUT_SYNCHRONUS - Callback is in sync with errors, so a breakpoint
+// GL_DEBUG_OUTPUT_SYNCHRONOUS - Callback is in sync with errors, so a breakpoint
 // can be placed on the callback in order to get a stacktrace for the GL error. (enable together with GL_DEBUG_OUTPUT !)
 
 // glEnable(GL_DEBUG_OUTPUT);
@@ -63,7 +63,7 @@ void GLDebugMessageCallback(GLenum source, GLenum type, GLuint id,
             break;
 
         case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-            _type = "UDEFINED BEHAVIOR";
+            _type = "UNDEFINED BEHAVIOR";
             break;
 
         case GL_DEBUG_TYPE_PORTABILITY:
@@ -110,7 +110,7 @@ void GLDebugMessageCallback(GLenum source, GLenum type, GLuint id,
     }
 
     if (_severity != "NOTIFICATION") {
-        spdlog::error("OpenGL error [{}]: {} of {} severity, raised from {}: {}\n",
-               id, _type, _severity, _source, msg);
+        spdlog::error("OpenGL error [{}]: {} of {} severity, raised from {}: {}",
+                      id, _type, _severity, _source, msg);
     }
 }

@@ -1,5 +1,6 @@
 #include <vector>
 #include "lib/glad/glad.h"
+#include "identity.h"
 
 struct VertexBufferElement {
     unsigned int type;
@@ -17,11 +18,6 @@ struct VertexBufferElement {
                 return 0;
         }
     }
-};
-
-template<typename T>
-struct identity {
-    typedef T type;
 };
 
 class VertexBufferLayout {

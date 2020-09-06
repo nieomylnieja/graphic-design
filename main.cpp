@@ -54,6 +54,7 @@ int main() {
     vao.AddBuffer(vbo, layout);
     ElementBuffer ebo = ElementBuffer(indices, sizeof(indices));
 
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
         // Input here
@@ -65,7 +66,11 @@ int main() {
 
         // draw triangle
         vao.Bind();
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        shaderProgram.Bind();
+        float timeValue = glfwGetTime();
+        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+        fragmentShader.SetUniform(shaderProgram.GetID(), "ourColor", std::vector<float>{0.0f, greenValue, 0.0f, 1.0f});
+        glDrawElements(GL_TRIANGLES, ebo.GetCount(), GL_UNSIGNED_INT, nullptr);
 
         // Swap front and back buffers
         glfwSwapBuffers(window);

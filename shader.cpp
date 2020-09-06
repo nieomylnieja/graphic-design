@@ -77,6 +77,18 @@ std::string Shader::parse(const std::string &filepath) {
     return ss.str();
 }
 
+int Shader::getUniformLocation(unsigned int program, const std::string &name) {
+    if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end()) {
+        return m_UniformLocationCache.at(name);
+    }
+    int location = glGetUniformLocation(program, name.c_str());
+    if (location == -1) {
+        spdlog::warn("Uniform {} doesn't exist!", name);
+    }
+    m_UniformLocationCache.insert({name, location});
+    return location;
+}
+
 std::string Shader::getShaderTypeString(ShaderType type) {
     switch (type) {
         case NONE:
@@ -107,6 +119,21 @@ int Shader::getShaderTypeGLEnum(ShaderType type) {
             return GL_GEOMETRY_SHADER;
         default:
             spdlog::error("shader type was not initialized at all");
+            exit(1);
+    }
+}
+
+void Shader::SetUniform(const int loc, int v) {
+    glUniform1i(loc, v);
+}
+
+void Shader::SetUniform(const int loc, const std::vector<float> &v) {
+    switch (v.size()) {
+        case 4:
+            glUniform4f(loc, v[0], v[1], v[2], v[3]);
+            return;
+        default:
+            spdlog::error("undefined float vector uniform for size: {}", v.size());
             exit(1);
     }
 }

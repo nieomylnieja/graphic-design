@@ -7,13 +7,14 @@ ShaderProgram::ShaderProgram(const std::vector<Shader> &shaders) : m_ID(glCreate
         shader.Attach(m_ID);
     }
     linkProgram();
-    glUseProgram(m_ID);
+    Bind();
     for (const auto &shader: shaders) {
         shader.Delete();
     }
 }
 
 ShaderProgram::~ShaderProgram() {
+    Unbind();
     glDeleteProgram(m_ID);
 }
 
@@ -30,4 +31,12 @@ void ShaderProgram::linkProgram() const {
         spdlog::error("Failed to link shader program. Message: {}", message);
         glDeleteProgram(m_ID);
     }
+}
+
+void ShaderProgram::Bind() const {
+    glUseProgram(m_ID);
+}
+
+void ShaderProgram::Unbind() {
+    glUseProgram(0);
 }
