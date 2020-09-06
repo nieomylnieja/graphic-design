@@ -1,15 +1,82 @@
 #include "lib/glad/glad.h"
 #include <GLFW/glfw3.h>
 
-#include <iostream>
 #include <spdlog/spdlog.h>
 
 #include "debug.h"
-#include "index_buffer.h"
-#include "vertex_array.h"
 #include "shader.h"
-#include "renderer.h"
-#include "Texture.h"
+#include "shader_program.h"
+#include "element_buffer.h"
+#include "vertex_array.h"
+
+// initialization functions
+void initializeGLFW();
+void initializeGLAD();
+void EnableGLDebug();
+GLFWwindow *initializeWindow();
+
+// runtime
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+void processInput(GLFWwindow *window);
+
+
+int main() {
+    initializeGLFW();
+
+    GLFWwindow *window = initializeWindow();
+    initializeGLAD();
+    // glew/glad has to be initialized first for it to work
+    EnableGLDebug();
+
+    glViewport(0, 0, 800, 600);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    Shader vertexShader = Shader("res/shaders/vertex.glsl");
+    Shader fragmentShader = Shader("res/shaders/fragment.glsl");
+
+    ShaderProgram shaderProgram = ShaderProgram(std::vector<Shader>{vertexShader, fragmentShader});
+
+    float vertices[] = {
+            0.5f, 0.5f, 0.0f,   // top right
+            0.5f, -0.5f, 0.0f,  // bottom right
+            -0.5f, -0.5f, 0.0f, // bottom left
+            -0.5f, 0.5f, 0.0f,  // top left
+    };
+    unsigned int indices[] = {
+            0, 1, 3,    // first triangle
+            1, 2, 3     // second triangle
+    };
+
+    VertexArray vao;
+    VertexBuffer vbo = VertexBuffer(vertices, sizeof(vertices));
+    VertexBufferLayout layout;
+    layout.Push<float>(3);
+    vao.AddBuffer(vbo, layout);
+    ElementBuffer ebo = ElementBuffer(indices, sizeof(indices));
+
+    /* Loop until the user closes the window */
+    while (!glfwWindowShouldClose(window)) {
+        // Input here
+        processInput(window);
+
+        // Render here
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // draw triangle
+        vao.Bind();
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+        // Swap front and back buffers
+        glfwSwapBuffers(window);
+
+        // Poll for and process events
+        glfwPollEvents();
+    }
+
+    glfwTerminate();
+    return 0;
+}
 
 void initializeGLFW() {
     /* Initialize the library */
@@ -29,6 +96,8 @@ void initializeGLAD() {
         spdlog::error("Failed to initialize GLAD");
         exit(1);
     }
+    // print gl version
+    spdlog::info(glGetString(GL_VERSION));
 }
 
 void EnableGLDebug() {
@@ -59,31 +128,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-int main() {
-    initializeGLFW();
-
-    GLFWwindow *window = initializeWindow();
-    initializeGLAD();
-    // glew/glad has to be initialized first for it to work
-    EnableGLDebug();
-
-    glViewport(0, 0, 800, 600);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    // print gl version
-    spdlog::info(glGetString(GL_VERSION));
-
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window)) {
-        /* Render here */
-
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-
-        /* Poll for and process events */
-        glfwPollEvents();
-    }
-
-    glfwTerminate();
-    return 0;
+void processInput(GLFWwindow *window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
 }

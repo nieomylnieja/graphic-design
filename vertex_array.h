@@ -5,15 +5,11 @@
 
 class VertexArray {
 private:
-    unsigned int m_RendererID{};
+    unsigned int m_ID;
 public:
     VertexArray();
-
     ~VertexArray();
-
     void AddBuffer(const VertexBuffer &vb, const VertexBufferLayout &layout) const;
-
     void Bind() const;
-
     static void Unbind();
 };

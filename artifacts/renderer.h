@@ -1,6 +1,6 @@
-#include "vertex_array.h"
-#include "shader.h"
-#include "index_buffer.h"
+#include "../vertex_array.h"
+#include "../shader.h"
+#include "../element_buffer.h"
 
 class Renderer {
 public:

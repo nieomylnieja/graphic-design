@@ -1,65 +1,35 @@
-#include <GL/glew.h>
+#include "lib/glad/glad.h"
 #include "shader.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
-int Shader::getUniformLocation(const std::string &name) {
-    if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end()) {
-        return m_UniformLocationCache.at(name);
-    }
-    int location = glGetUniformLocation(m_RendererID, name.c_str());
-    if (location == -1) {
-        std::cout << "Warning: uniform '" << name << "' doesn't exist!" << std::endl;
-    }
-    m_UniformLocationCache.insert({name, location});
-    return location;
-}
+#include <boost/algorithm/string.hpp>
+#include <spdlog/spdlog.h>
 
 Shader::Shader(const std::string &filepath)
-        : m_Filepath(filepath), m_RendererID(0) {
-    ShaderProgramSource source = parse(filepath);
-    m_RendererID = create(source.VertexSource, source.FragmentSource);
+        : m_Filepath(filepath), m_ID(0), m_Type(NONE) {
+    std::string source = parse(filepath);
+    m_ID = compile(source);
 }
 
 Shader::~Shader() {
-    glDeleteProgram(m_RendererID);
+    glDeleteShader(m_ID);
 }
 
-void Shader::Bind() const {
-    glUseProgram(m_RendererID);
+void Shader::Attach(unsigned int shaderProgram) const {
+    glAttachShader(shaderProgram, m_ID);
 }
 
-void Shader::Unbind() {
-    glUseProgram(0);
+void Shader::Detach(unsigned int shaderProgram) const {
+    glDetachShader(shaderProgram, m_ID);
 }
 
-ShaderProgramSource Shader::parse(const std::string &filepath) {
-    std::ifstream stream(filepath);
-
-    enum class ShaderType {
-        NONE = -1, VERTEX = 0, FRAGMENT = 1
-    };
-
-    std::string line;
-    std::stringstream ss[2];
-    ShaderType type = ShaderType::NONE;
-    while (getline(stream, line)) {
-        if (line.find("#shader") != std::string::npos) {
-            if (line.find("vertex") != std::string::npos) {
-                type = ShaderType::VERTEX;
-            } else if (line.find("fragment") != std::string::npos) {
-                type = ShaderType::FRAGMENT;
-            }
-            continue;
-        }
-        ss[(int) type] << line << '\n';
-    }
-    return {ss[0].str(), ss[1].str()};
+void Shader::Delete() const {
+    glDeleteShader(m_ID);
 }
 
-unsigned int Shader::compile(unsigned int type, const std::string &source) {
-    unsigned int id = glCreateShader(type);
+unsigned int Shader::compile(const std::string &source) {
+    unsigned int id = glCreateShader(getShaderTypeGLEnum(m_Type));
     const char *src = source.c_str();
     glShaderSource(id, 1, &src, nullptr);
     glCompileShader(id);
@@ -71,34 +41,72 @@ unsigned int Shader::compile(unsigned int type, const std::string &source) {
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
         char *message = (char *) alloca(length * sizeof(char));
         glGetShaderInfoLog(id, length, &length, message);
-        std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << "shader"
-                  << std::endl;
-        std::cout << message << std::endl;
+        spdlog::error("Failed to compile {} shader. Message: {}", getShaderTypeString(m_Type), message);
         glDeleteShader(id);
     }
     return id;
 }
 
-unsigned int Shader::create(const std::string &vertexShader, const std::string &fragmentShader) {
-    unsigned int program = glCreateProgram();
-    unsigned int vs = compile(GL_VERTEX_SHADER, vertexShader);
-    unsigned int fs = compile(GL_FRAGMENT_SHADER, fragmentShader);
+std::string Shader::parse(const std::string &filepath) {
+    std::ifstream stream(filepath);
+    if (stream.fail() || stream.bad()) {
+        spdlog::error("failed to open the file: {}", filepath);
+        exit(1);
+    }
 
-    glAttachShader(program, vs);
-    glAttachShader(program, fs);
-    glLinkProgram(program);
-    glValidateProgram(program);
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
-
-    return program;
+    std::string line;
+    std::stringstream ss;
+    while (getline(stream, line)) {
+        if (boost::contains(line, "#type")) {
+            std::vector<std::string> split;
+            boost::split(split, line, boost::is_any_of("\t "));
+            if (split.size() != 2) {
+                spdlog::error("invalid header specification, please provide the shader type as such: '#type vertex'");
+            }
+            if (split[1] == "vertex") {
+                m_Type = VERTEX;
+            } else if (split[1] == "fragment") {
+                m_Type = FRAGMENT;
+            } else if (split[1] == "geometry") {
+                m_Type = GEOMETRY;
+            }
+            continue;
+        }
+        ss << line << '\n';
+    }
+    return ss.str();
 }
 
-void Shader::SetUniform1i(const std::string &name, int v) {
-    glUniform1i(getUniformLocation(name), v);
+std::string Shader::getShaderTypeString(ShaderType type) {
+    switch (type) {
+        case NONE:
+            spdlog::error("shader type was not initialized and is set to NONE");
+            exit(1);
+        case VERTEX:
+            return "vertex";
+        case FRAGMENT:
+            return "fragment";
+        case GEOMETRY:
+            return "geometry";
+        default:
+            spdlog::error("shader type was not initialized at all");
+            exit(1);
+    }
 }
 
-void Shader::SetUniform4f(const std::string &name, const std::vector<float> &v) {
-    glUniform4f(getUniformLocation(name), v[0], v[1], v[2], v[4]);
+int Shader::getShaderTypeGLEnum(ShaderType type) {
+    switch (type) {
+        case NONE:
+            spdlog::error("shader type was not initialized and is set to NONE");
+            exit(1);
+        case VERTEX:
+            return GL_VERTEX_SHADER;
+        case FRAGMENT:
+            return GL_FRAGMENT_SHADER;
+        case GEOMETRY:
+            return GL_GEOMETRY_SHADER;
+        default:
+            spdlog::error("shader type was not initialized at all");
+            exit(1);
+    }
 }

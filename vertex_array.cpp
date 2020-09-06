@@ -1,30 +1,28 @@
 #include "vertex_array.h"
 #include "lib/glad/glad.h"
 
-VertexArray::VertexArray() {
-    glCreateVertexArrays(1, &m_RendererID);
+VertexArray::VertexArray() : m_ID(0) {
+    glGenVertexArrays(1, &m_ID);
 }
 
 VertexArray::~VertexArray() {
-    glDeleteVertexArrays(1, &m_RendererID);
+    glDeleteVertexArrays(1, &m_ID);
 }
 
 void VertexArray::AddBuffer(const VertexBuffer &vb, const VertexBufferLayout &layout) const {
     Bind();
     vb.Bind();
-    const auto &elements = layout.GetElements();
-    unsigned int offset = 0;
-    for (unsigned int i = 0; i < elements.size(); i++) {
-        const auto &element = elements[i];
+    unsigned int i = 0, offset = 0;
+    for (const auto element : layout.GetElements()) {
+        glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (void *) nullptr);
         glEnableVertexAttribArray(i);
-        glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(),
-                              reinterpret_cast<const void *>(offset));
         offset += element.type;
+        i++;
     }
 }
 
 void VertexArray::Bind() const {
-    glBindVertexArray(m_RendererID);
+    glBindVertexArray(m_ID);
 }
 
 void VertexArray::Unbind() {

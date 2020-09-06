@@ -1,5 +1,3 @@
-#pragma once
-
 #include <vector>
 #include "lib/glad/glad.h"
 
@@ -28,15 +26,14 @@ struct identity {
 
 class VertexBufferLayout {
 public:
-    VertexBufferLayout()
-            : m_Stride(0) {}
+    VertexBufferLayout() : m_Stride(0) {}
 
     template<typename TL>
     void Push(unsigned int count) {
         Push(count, identity<TL>());
     }
 
-    inline const std::vector<VertexBufferElement> GetElements() const { return m_Elements; }
+    inline std::vector<VertexBufferElement> GetElements() const { return m_Elements; }
 
     inline unsigned int GetStride() const { return m_Stride; }
 

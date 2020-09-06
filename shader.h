@@ -4,36 +4,25 @@
 #include <vector>
 #include <unordered_map>
 
-struct ShaderProgramSource {
-    std::string VertexSource;
-    std::string FragmentSource;
+enum ShaderType {
+    NONE = -1, VERTEX = 0, FRAGMENT = 1, GEOMETRY = 2
 };
 
 class Shader {
 private:
+    ShaderType m_Type;
     std::string m_Filepath;
-    unsigned int m_RendererID;
-    std::unordered_map<std::string, int> m_UniformLocationCache;
+    unsigned int m_ID;
 
-    static ShaderProgramSource parse(const std::string &filepath);
-
-    int getUniformLocation(const std::string &name);
-
-    static unsigned int compile(unsigned int type, const std::string &source);
-
-    static unsigned int create(const std::string &vertexShader, const std::string &fragmentShader);
+    std::string parse(const std::string &filepath);
+    unsigned int compile(const std::string &source);
+    static std::string getShaderTypeString(ShaderType type);
+    static int getShaderTypeGLEnum(ShaderType type);
 
 public:
     explicit Shader(const std::string &filepath);
-
     ~Shader();
-
-    void Bind() const;
-
-    static void Unbind();
-
-    // Set uniforms
-    void SetUniform1i(const std::string &name, int v);
-
-    void SetUniform4f(const std::string &name, const std::vector<float> &v);
+    void Attach(unsigned int shaderProgram) const;
+    void Detach(unsigned int shaderProgram) const;
+    void Delete() const;
 };
