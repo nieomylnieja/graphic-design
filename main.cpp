@@ -8,6 +8,8 @@
 #include "shader_program.h"
 #include "element_buffer.h"
 #include "vertex_array.h"
+#include "renderer.h"
+#include "texture.h"
 
 // initialization functions
 void initializeGLFW();
@@ -19,6 +21,10 @@ GLFWwindow *initializeWindow();
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
 
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
+
 
 int main() {
     initializeGLFW();
@@ -28,32 +34,38 @@ int main() {
     // glew/glad has to be initialized first for it to work
     EnableGLDebug();
 
-    glViewport(0, 0, 800, 600);
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    Shader vertexShader = Shader("res/shaders/vertex.glsl");
-    Shader fragmentShader = Shader("res/shaders/fragment.glsl");
+    Shader vertexShader("res/shaders/vertex.glsl");
+    Shader fragmentShader("res/shaders/fragment.glsl");
 
-    ShaderProgram shaderProgram = ShaderProgram(std::vector<Shader>{vertexShader, fragmentShader});
+    ShaderProgram shaderProgram(std::vector<Shader>{vertexShader, fragmentShader});
 
     float vertices[] = {
-            0.5f, 0.5f, 0.0f,   // top right
-            0.5f, -0.5f, 0.0f,  // bottom right
-            -0.5f, -0.5f, 0.0f, // bottom left
-            -0.5f, 0.5f, 0.0f,  // top left
+            // positions          // colors           // texture coords
+            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,   // top right
+            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,   // bottom right
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,   // bottom left
+            -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f    // top left
     };
+
     unsigned int indices[] = {
-            0, 1, 3,    // first triangle
-            1, 2, 3     // second triangle
+            0, 1, 3, // first triangle
+            1, 2, 3  // second triangle
     };
 
     VertexArray vao;
-    VertexBuffer vbo = VertexBuffer(vertices, sizeof(vertices));
+    VertexBuffer vbo(vertices, sizeof(vertices));
     VertexBufferLayout layout;
-    layout.Push<float>(3);
+    layout.Push<float>(3, 0);
+    layout.Push<float>(3, 3);
+    layout.Push<float>(2, 6);
     vao.AddBuffer(vbo, layout);
-    ElementBuffer ebo = ElementBuffer(indices, sizeof(indices));
+    ElementBuffer ebo(indices, sizeof(indices));
 
+    Texture texture("res/textures/container.jpg");
+    texture.Bind();
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
@@ -62,15 +74,10 @@ int main() {
 
         // Render here
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        Renderer::Clear();
 
         // draw triangle
-        vao.Bind();
-        shaderProgram.Bind();
-        float timeValue = glfwGetTime();
-        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-        fragmentShader.SetUniform(shaderProgram.GetID(), "ourColor", std::vector<float>{0.0f, greenValue, 0.0f, 1.0f});
-        glDrawElements(GL_TRIANGLES, ebo.GetCount(), GL_UNSIGNED_INT, nullptr);
+        Renderer::Draw(shaderProgram, vao, ebo);
 
         // Swap front and back buffers
         glfwSwapBuffers(window);

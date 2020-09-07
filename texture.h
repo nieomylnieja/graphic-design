@@ -2,10 +2,10 @@
 
 class Texture {
 private:
-    unsigned int m_RendererID;
+    unsigned int m_ID;
     std::string m_FilePath;
     unsigned char *m_LocalBuffer;
-    int m_Width, m_Height, m_BPP;
+    int m_Width, m_Height, m_nChannels;
 public:
     explicit Texture(const std::string &path);
 
