@@ -7,7 +7,7 @@ ShaderProgram::ShaderProgram(const std::vector<Shader> &shaders) : m_ID(glCreate
         shader.Attach(m_ID);
     }
     linkProgram();
-    Bind();
+    Use();
     for (const auto &shader: shaders) {
         shader.Delete();
     }
@@ -33,7 +33,7 @@ void ShaderProgram::linkProgram() const {
     }
 }
 
-void ShaderProgram::Bind() const {
+void ShaderProgram::Use() const {
     glUseProgram(m_ID);
 }
 

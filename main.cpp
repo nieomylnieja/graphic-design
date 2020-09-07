@@ -64,8 +64,15 @@ int main() {
     vao.AddBuffer(vbo, layout);
     ElementBuffer ebo(indices, sizeof(indices));
 
-    Texture texture("res/textures/container.jpg");
-    texture.Bind();
+    Texture texture1({"res/textures/container.jpg", GL_RGB, GL_RGB, false});
+    Texture texture2({"res/textures/awesomeface.png", GL_RGB, GL_RGBA, true});
+
+    texture1.Bind(0);
+    texture2.Bind(1);
+
+    shaderProgram.Use();
+    fragmentShader.SetUniform(shaderProgram.GetID(), "texture1", 0);
+    fragmentShader.SetUniform(shaderProgram.GetID(), "texture2", 1);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {

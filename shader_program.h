@@ -11,7 +11,7 @@ private:
 public:
     explicit ShaderProgram(const std::vector<Shader> &shaders);
     ~ShaderProgram();
-    void Bind() const;
+    void Use() const;
     static void Unbind();
     unsigned int GetID() const { return m_ID; };
 };

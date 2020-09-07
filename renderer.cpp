@@ -1,14 +1,14 @@
 #include "renderer.h"
 
 void Renderer::Draw(const ShaderProgram &program, const VertexArray &va, const ElementBuffer &eb) {
-    program.Bind();
+    program.Use();
     va.Bind();
     eb.Bind();
     glDrawElements(GL_TRIANGLES, eb.GetCount(), GL_UNSIGNED_INT, nullptr);
 }
 
 void Renderer::Draw(const ShaderProgram &program, const VertexArray &va) {
-    program.Bind();
+    program.Use();
     va.Bind();
     glDrawArrays(GL_TRIANGLES, 0, GL_UNSIGNED_INT);
 }

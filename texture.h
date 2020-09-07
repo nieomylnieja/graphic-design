@@ -1,5 +1,12 @@
 #include <string>
 
+struct TextureSpec {
+    std::string Path;
+    unsigned int TargetFormat;
+    unsigned int SourceFormat;
+    bool FlipImage;
+};
+
 class Texture {
 private:
     unsigned int m_ID;
@@ -7,7 +14,7 @@ private:
     unsigned char *m_LocalBuffer;
     int m_Width, m_Height, m_nChannels;
 public:
-    explicit Texture(const std::string &path);
+    explicit Texture(const TextureSpec &spec);
 
     ~Texture();
 
