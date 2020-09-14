@@ -4,6 +4,8 @@
 #include <vector>
 #include <unordered_map>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 enum ShaderType {
     NONE = -1, VERTEX = 0, FRAGMENT = 1, GEOMETRY = 2
 };
@@ -25,6 +27,7 @@ private:
     static void SetUniform(int loc, T v) { static_assert(true, ""); }
     static void SetUniform(int loc, int v);
     static void SetUniform(int loc, const std::vector<float> &v);
+    static void SetUniform(int loc, glm::mat4 v);
 
 public:
     explicit Shader(const std::string &filepath);

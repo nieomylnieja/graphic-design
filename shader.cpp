@@ -5,6 +5,7 @@
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 #include <spdlog/spdlog.h>
+#include <glm/gtc/type_ptr.inl>
 
 Shader::Shader(const std::string &filepath)
         : m_Filepath(filepath), m_ID(0), m_Type(NONE) {
@@ -136,4 +137,8 @@ void Shader::SetUniform(const int loc, const std::vector<float> &v) {
             spdlog::error("undefined float vector uniform for size: {}", v.size());
             exit(1);
     }
+}
+
+void Shader::SetUniform(int loc, glm::mat4 v) {
+    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(v));
 }

@@ -8,5 +8,5 @@ public:
     static void Clear();
 
     static void Draw(const ShaderProgram &program, const VertexArray &va, const ElementBuffer &eb);
-    static void Draw(const ShaderProgram &program, const VertexArray &va);
+    static void Draw(const ShaderProgram &program, const VertexArray &va, unsigned int count);
 };

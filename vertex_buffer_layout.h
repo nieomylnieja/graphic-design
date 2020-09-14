@@ -26,6 +26,11 @@ public:
     VertexBufferLayout() : m_Stride(0) {}
 
     template<typename TL>
+    void Push(unsigned int count) {
+        Push(count, 0, identity<TL>());
+    }
+
+    template<typename TL>
     void Push(unsigned int count, int offset) {
         Push(count, offset, identity<TL>());
     }
