@@ -13,6 +13,7 @@
 #include "vertex_array.h"
 #include "renderer.h"
 #include "texture.h"
+#include "camera.h"
 
 // initialization functions
 void initializeGLFW();
@@ -22,14 +23,14 @@ GLFWwindow *initializeWindow();
 
 // runtime
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-void processInput(GLFWwindow *window);
+void mouse_callback(GLFWwindow *window, double xpos, double ypos);
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-int pgnTest();
-
+Camera camera(SCR_WIDTH, SCR_HEIGHT);
 
 int main() {
     initializeGLFW();
@@ -41,6 +42,10 @@ int main() {
 
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+
+    Camera::Init(window);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -135,7 +140,7 @@ int main() {
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
         // Input here
-        processInput(window);
+        camera.ProcessKeyboardInput(window);
 
         // Render here
         Renderer::Clear();
@@ -144,16 +149,9 @@ int main() {
         texture2.Bind(1);
 
         shaderProgram.Use();
-
-        // draw triangle
-        glm::mat4 view = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        glm::mat4 projection = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 100.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
         // pass transformation matrices to the shader
-        vertexShader.SetUniform(shaderProgram.GetID(), "projection",
-                                projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
-        vertexShader.SetUniform(shaderProgram.GetID(), "view", view);
+        vertexShader.SetUniform(shaderProgram.GetID(), "projection", camera.GetProjection());
+        vertexShader.SetUniform(shaderProgram.GetID(), "view", camera.GetView());
 
         vao.Bind();
         // render boxes
@@ -212,7 +210,7 @@ GLFWwindow *initializeWindow() {
     GLFWwindow *window;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(800, 600, "Chess club", nullptr, nullptr);
+    window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Chess club", nullptr, nullptr);
     if (!window) {
         spdlog::error("Failed to create GLFW window");
         glfwTerminate();
@@ -230,7 +228,11 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
+    camera.ProcessMouseInput((float) xpos, (float) ypos);
 }
+
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+    camera.ProcessMouseScroll((float) yoffset);
+}
+
