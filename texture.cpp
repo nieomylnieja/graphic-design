@@ -1,4 +1,4 @@
-#include "lib/glad/glad.h"
+#include <glad/glad.h>
 #include "spdlog/spdlog.h"
 #include "texture.h"
 

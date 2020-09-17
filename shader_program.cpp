@@ -1,6 +1,6 @@
+#include <glad/glad.h>
 #include <spdlog/spdlog.h>
 #include "shader_program.h"
-#include "lib/glad/glad.h"
 
 ShaderProgram::ShaderProgram(const std::vector<Shader> &shaders) : m_ID(glCreateProgram()) {
     for (const auto &shader: shaders) {

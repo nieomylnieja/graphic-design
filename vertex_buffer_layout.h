@@ -1,5 +1,5 @@
 #include <vector>
-#include "lib/glad/glad.h"
+#include <glad/glad.h>
 #include "identity.h"
 
 struct VertexBufferElement {

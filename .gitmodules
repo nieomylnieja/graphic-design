@@ -7,3 +7,6 @@
 [submodule "lib/glm"]
 	path = lib/glm
 	url = git@github.com:g-truc/glm.git
+[submodule "lib/vcpkg"]
+	path = lib/vcpkg
+	url = https://github.com/microsoft/vcpkg

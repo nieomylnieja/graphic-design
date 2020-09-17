@@ -2,7 +2,7 @@
 
 //#include <GL/glew.h>
 #include <iostream>
-#include "lib/glad/glad.h"
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 void GLDebugMessageCallback(GLenum source, GLenum type, GLuint id,

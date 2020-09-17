@@ -1,5 +1,5 @@
+#include <glad/glad.h>
 #include "element_buffer.h"
-#include "lib/glad/glad.h"
 
 ElementBuffer::ElementBuffer(const unsigned int *data, unsigned int count) : m_ID(0), m_Count(count) {
     glGenBuffers(1, &m_ID);
