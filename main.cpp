@@ -12,8 +12,10 @@
 #include "element_buffer.h"
 #include "vertex_array.h"
 #include "renderer.h"
-#include "texture.h"
 #include "camera.h"
+#include "model.h"
+
+#include <iostream>
 
 // initialization functions
 void initializeGLFW();
@@ -54,86 +56,8 @@ int main() {
 
     ShaderProgram shaderProgram(std::vector<Shader>{vertexShader, fragmentShader});
 
-    float vertices[] = {
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-            0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-            0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-            -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-
-            -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-            -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-            -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-
-            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-
-            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-            0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-            0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-
-            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-            -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f
-    };
-
-    // world space positions of our cubes
-    glm::vec3 cubePositions[] = {
-            glm::vec3(0.0f, 0.0f, 0.0f),
-            glm::vec3(2.0f, 5.0f, -15.0f),
-            glm::vec3(-1.5f, -2.2f, -2.5f),
-            glm::vec3(-3.8f, -2.0f, -12.3f),
-            glm::vec3(2.4f, -0.4f, -3.5f),
-            glm::vec3(-1.7f, 3.0f, -7.5f),
-            glm::vec3(1.3f, -2.0f, -2.5f),
-            glm::vec3(1.5f, 2.0f, -2.5f),
-            glm::vec3(1.5f, 0.2f, -1.5f),
-            glm::vec3(-1.3f, 1.0f, -1.5f)
-    };
-
-//    unsigned int indices[] = {
-//            0, 1, 3, // first triangle
-//            1, 2, 3  // second triangle
-//    };
-//
-    VertexArray vao;
-    VertexBuffer vbo(vertices, sizeof(vertices));
-    VertexBufferLayout layout;
-    layout.Push<float>(3);
-    layout.Push<float>(2, 3);
-    vao.AddBuffer(vbo, layout);
-//    ElementBuffer ebo(indices, sizeof(indices));
-
-    Texture texture1({"res/textures/container.jpg", GL_RGB, GL_RGB, false});
-    Texture texture2({"res/textures/awesomeface.png", GL_RGB, GL_RGBA, true});
-
-    texture1.Bind(0);
-    texture2.Bind(1);
-
     shaderProgram.Use();
-    fragmentShader.SetUniform(shaderProgram.GetID(), "texture1", 0);
-    fragmentShader.SetUniform(shaderProgram.GetID(), "texture2", 1);
+    Model ourModel("res/objects/backpack/backpack.obj");
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
@@ -145,27 +69,20 @@ int main() {
         // Render here
         Renderer::Clear();
 
-        texture1.Bind(0);
-        texture2.Bind(1);
-
         shaderProgram.Use();
+        fragmentShader.Attach(shaderProgram.GetID());
+        vertexShader.Attach(shaderProgram.GetID());
         // pass transformation matrices to the shader
-        vertexShader.SetUniform(shaderProgram.GetID(), "projection", camera.GetProjection());
-        vertexShader.SetUniform(shaderProgram.GetID(), "view", camera.GetView());
+        shaderProgram.SetUniform("projection", camera.GetProjection());
+        shaderProgram.SetUniform("view", camera.GetView());
 
-        vao.Bind();
-        // render boxes
-        for (unsigned int i = 0; i < 10; i++) {
-            // calculate the model matrix for each object and pass it to shader before drawing
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i;
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            vertexShader.SetUniform(shaderProgram.GetID(), "model", model);
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-//            Renderer::Draw(shaderProgram, vao, 36);
-        }
+        // render the loaded model
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model,
+                               glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));    // it's a bit too big for our scene, so scale it down
+        shaderProgram.SetUniform("model", model);
+        ourModel.Draw(shaderProgram);
 
         // Swap front and back buffers
         glfwSwapBuffers(window);
@@ -189,6 +106,7 @@ void initializeGLFW() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     // core profile requires us to create a vertex object array, If we're to resign from it, we need compat profile
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 }
 
 void initializeGLAD() {

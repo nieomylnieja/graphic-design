@@ -5,7 +5,6 @@
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 #include <spdlog/spdlog.h>
-#include <glm/gtc/type_ptr.inl>
 
 Shader::Shader(const std::string &filepath)
         : m_Filepath(filepath), m_ID(0), m_Type(NONE) {
@@ -78,18 +77,6 @@ std::string Shader::parse(const std::string &filepath) {
     return ss.str();
 }
 
-int Shader::getUniformLocation(unsigned int program, const std::string &name) {
-    if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end()) {
-        return m_UniformLocationCache.at(name);
-    }
-    int location = glGetUniformLocation(program, name.c_str());
-    if (location == -1) {
-        spdlog::warn("Uniform {} doesn't exist!", name);
-    }
-    m_UniformLocationCache.insert({name, location});
-    return location;
-}
-
 std::string Shader::getShaderTypeString(ShaderType type) {
     switch (type) {
         case NONE:
@@ -122,23 +109,4 @@ int Shader::getShaderTypeGLEnum(ShaderType type) {
             spdlog::error("shader type was not initialized at all");
             exit(1);
     }
-}
-
-void Shader::SetUniform(const int loc, int v) {
-    glUniform1i(loc, v);
-}
-
-void Shader::SetUniform(const int loc, const std::vector<float> &v) {
-    switch (v.size()) {
-        case 4:
-            glUniform4f(loc, v[0], v[1], v[2], v[3]);
-            return;
-        default:
-            spdlog::error("undefined float vector uniform for size: {}", v.size());
-            exit(1);
-    }
-}
-
-void Shader::SetUniform(int loc, glm::mat4 v) {
-    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(v));
 }

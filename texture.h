@@ -1,28 +1,27 @@
 #include <string>
 
 struct TextureSpec {
-    std::string Path;
-    unsigned int TargetFormat;
-    unsigned int SourceFormat;
+    std::string FileName;
+    std::string FilePath;
+    std::string Type;
     bool FlipImage;
 };
 
 class Texture {
 private:
     unsigned int m_ID;
+    std::string m_FileName;
     std::string m_FilePath;
+    std::string m_Type;
     unsigned char *m_LocalBuffer;
     int m_Width, m_Height, m_nChannels;
 public:
     explicit Texture(const TextureSpec &spec);
-
     ~Texture();
 
     void Bind(unsigned int slot = 0) const;
-
     static void Unbind();
 
-    inline int GetWidth() const { return m_Width; };
-
-    inline int GetHeight() const { return m_Height; };
+    inline std::string GetType() const { return m_Type; };
+    inline std::string GetFileName() const { return m_FileName; };
 };
