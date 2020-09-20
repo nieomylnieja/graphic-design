@@ -9,8 +9,6 @@
 #include "debug.h"
 #include "shader.h"
 #include "shader_program.h"
-#include "element_buffer.h"
-#include "vertex_array.h"
 #include "renderer.h"
 #include "camera.h"
 #include "model.h"
@@ -47,7 +45,7 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
-    Camera::Init(window);
+//    Camera::Init(window);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -70,17 +68,15 @@ int main() {
         Renderer::Clear();
 
         shaderProgram.Use();
-        fragmentShader.Attach(shaderProgram.GetID());
-        vertexShader.Attach(shaderProgram.GetID());
         // pass transformation matrices to the shader
         shaderProgram.SetUniform("projection", camera.GetProjection());
         shaderProgram.SetUniform("view", camera.GetView());
 
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model,
-                               glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));    // it's a bit too big for our scene, so scale it down
+//        model = glm::translate(model,
+//                               glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+//        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));    // it's a bit too big for our scene, so scale it down
         shaderProgram.SetUniform("model", model);
         ourModel.Draw(shaderProgram);
 

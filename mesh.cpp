@@ -26,52 +26,42 @@ void Mesh::Draw(ShaderProgram &shaderProgram) {
         if (type == "texture_diffuse")
             number = std::to_string(diffuseNr++);
         else if (type == "texture_specular")
-            number = std::to_string(specularNr++); // transfer unsigned int to stream
+            number = std::to_string(specularNr++);
         else if (type == "texture_normal")
-            number = std::to_string(normalNr++); // transfer unsigned int to stream
+            number = std::to_string(normalNr++);
         else if (type == "texture_height")
-            number = std::to_string(heightNr++); // transfer unsigned int to stream
+            number = std::to_string(heightNr++);
         // now set the sampler to the correct texture unit
         shaderProgram.SetUniform(type + number, i);
-        // and finally bind the texture
-        m_Textures[i].Unbind();
     }
 
     // draw mesh
-    glBindVertexArray(vao);
+    vao.Bind();
     glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
+    VertexArray::Unbind();
+    Texture::Unbind();
 }
 
 // TODO use vertex_buffer and the family here
 void Mesh::setupMesh() {
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-    glGenBuffers(1, &ebo);
+    VertexArray vaoDecl = VertexArray();
+    vao = vaoDecl;
+    vao.Bind();
 
-    glBindVertexArray(vao);
+    VertexBuffer vboDecl = VertexBuffer(&m_Vertices[0], m_Vertices.size() * sizeof(Vertex));
+    vbo = vboDecl;
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(Vertex), &m_Vertices[0], GL_STATIC_DRAW);
+    ElementBuffer eboDecl = ElementBuffer(&m_Indices[0], m_Indices.size());
+    ebo = eboDecl;
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Indices.size() * sizeof(unsigned int), &m_Indices[0], GL_STATIC_DRAW);
+    VertexBufferLayout layout = VertexBufferLayout();
+    layout.Push<Vertex>(3);
+    layout.Push<Vertex>(3, offsetof(Vertex, Normal));
+    layout.Push<Vertex>(2, offsetof(Vertex, TexCoords));
+    layout.Push<Vertex>(3, offsetof(Vertex, Tangent));
+    layout.Push<Vertex>(3, offsetof(Vertex, Bitangent));
+    layout.SetStride(sizeof(Vertex));
+    vao.AddBuffer(vbo, layout);
 
-    // vertex Positions
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) nullptr);
-    // vertex normals
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, Normal));
-    // vertex texture coords
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, TexCoords));
-    // vertex tangent
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, Tangent));
-    // vertex bitangent
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, Bitangent));
-
-    glBindVertexArray(0);
+    VertexArray::Unbind();
 }

@@ -1,3 +1,6 @@
+#ifndef GRAPHIC_DESIGN_TEXTURE_H
+#define GRAPHIC_DESIGN_TEXTURE_H
+
 #include <string>
 
 struct TextureSpec {
@@ -25,3 +28,5 @@ public:
     inline std::string GetType() const { return m_Type; };
     inline std::string GetFileName() const { return m_FileName; };
 };
+
+#endif

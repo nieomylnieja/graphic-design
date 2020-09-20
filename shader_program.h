@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GRAPHIC_DESIGN_SHADER_PROGRAM_H
+#define GRAPHIC_DESIGN_SHADER_PROGRAM_H
 
 #include "shader.h"
 
@@ -29,3 +30,5 @@ public:
         SetUniform(getUniformLocation(name), v);
     };
 };
+
+#endif

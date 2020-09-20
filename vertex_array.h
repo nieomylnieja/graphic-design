@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GRAPHIC_DESIGN_VERTEX_ARRAY_BUFFER_H
+#define GRAPHIC_DESIGN_VERTEX_ARRAY_BUFFER_H
 
 #include "vertex_buffer.h"
 #include "vertex_buffer_layout.h"
@@ -13,3 +14,5 @@ public:
     void Bind() const;
     static void Unbind();
 };
+
+#endif

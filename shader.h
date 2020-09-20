@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GRAPHIC_DESIGN_SHADER_H
+#define GRAPHIC_DESIGN_SHADER_H
 
 #include <string>
 #include <vector>
@@ -28,3 +29,5 @@ public:
     void Detach(unsigned int shaderProgram) const;
     void Delete() const;
 };
+
+#endif

@@ -47,7 +47,7 @@ Texture::Texture(const TextureSpec &spec)
 }
 
 Texture::~Texture() {
-    glDeleteTextures(1, &m_ID);
+//    glDeleteTextures(1, &m_ID);
 }
 
 void Texture::Bind(unsigned int slot) const {

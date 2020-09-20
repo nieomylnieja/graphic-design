@@ -1,21 +1,18 @@
+#ifndef GRAPHIC_DESIGN_MESH_H
+#define GRAPHIC_DESIGN_MESH_H
+
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
+#include <memory>
 #include "texture.h"
 #include "shader_program.h"
-
-struct Vertex {
-    glm::vec3 Position;
-    glm::vec3 Normal;
-    glm::vec2 TexCoords;
-    glm::vec3 Tangent;
-    glm::vec3 Bitangent;
-};
+#include "element_buffer.h"
+#include "vertex_buffer.h"
+#include "vertex_array.h"
 
 class Mesh {
 public:
-    unsigned int vao{};
-    // mesh data
     std::vector<Vertex> m_Vertices;
     std::vector<unsigned int> m_Indices;
     std::vector<Texture> m_Textures;
@@ -25,8 +22,12 @@ public:
 
     void Draw(ShaderProgram &shaderProgram);
 private:
-    //  render data
-    unsigned int vbo{}, ebo{};
+    unsigned int vaox{};
+    VertexArray vao{};
+    VertexBuffer vbo{};
+    ElementBuffer ebo{};
 
     void setupMesh();
 };
+
+#endif

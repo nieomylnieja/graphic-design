@@ -1,6 +1,10 @@
+#ifndef GRAPHIC_DESIGN_VERTEX_BUFFER_LAYOUT_BUFFER_H
+#define GRAPHIC_DESIGN_VERTEX_BUFFER_LAYOUT_BUFFER_H
+
 #include <vector>
 #include <glad/glad.h>
 #include "identity.h"
+#include "vertex.h"
 
 struct VertexBufferElement {
     unsigned int type;
@@ -37,6 +41,7 @@ public:
 
     inline std::vector<VertexBufferElement> GetElements() const { return m_Elements; }
 
+    inline void SetStride(unsigned int stride) { m_Stride = stride; };
     inline unsigned int GetStride() const { return m_Stride; }
 
 private:
@@ -54,6 +59,12 @@ private:
         m_Stride += size * count;
     }
 
+    void Push(unsigned int count, int offset, identity<Vertex>) {
+        unsigned int size = sizeof(Vertex);
+        m_Elements.push_back({GL_FLOAT, count, GL_FALSE, offset});
+        m_Stride = size;
+    }
+
     void Push(unsigned int count, int offset, identity<unsigned int>) {
         unsigned int size = VertexBufferElement::SizeOf(GL_UNSIGNED_INT);
         m_Elements.push_back({GL_UNSIGNED_INT, count, GL_FALSE, static_cast<int>(offset * size)});
@@ -67,3 +78,4 @@ private:
     }
 };
 
+#endif

@@ -1,3 +1,6 @@
+#ifndef GRAPHIC_DESIGN_RENDERER_H
+#define GRAPHIC_DESIGN_RENDERER_H
+
 #include "vertex_array.h"
 #include "shader.h"
 #include "element_buffer.h"
@@ -10,3 +13,5 @@ public:
     static void Draw(const ShaderProgram &program, const VertexArray &va, const ElementBuffer &eb);
     static void Draw(const ShaderProgram &program, const VertexArray &va, unsigned int count);
 };
+
+#endif

@@ -25,7 +25,7 @@ Camera::Camera(const unsigned int scrWidth, const unsigned int scrHeight) : m_Po
 Camera::~Camera() = default;
 
 void Camera::Init(GLFWwindow *window) {
-//    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void Camera::ProcessKeyboardInput(GLFWwindow *window) {
