@@ -1,6 +1,6 @@
 # Blender v2.80 (sub 75) OBJ File: 'render-5.blend'
 # www.blender.org
-mtllib Queen.mtl
+mtllib queen.mtl
 o Circle.004_Circle.005
 v -0.000766 -0.013510 -0.000592
 v -0.003402 -0.013250 -0.000592

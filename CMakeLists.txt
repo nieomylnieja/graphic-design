@@ -20,7 +20,7 @@ find_package(glad CONFIG REQUIRED)
 
 set(SOURCE_FILES main.cpp debug.h debug.cpp vertex_buffer.h vertex_buffer.cpp shader.h shader.cpp shader_program.cpp
         shader_program.h element_buffer.h element_buffer.cpp vertex_buffer_layout.h vertex_array.h vertex_array.cpp identity.h renderer.cpp
-        texture.h texture.cpp camera.cpp camera.h mesh.cpp mesh.h model.cpp model.h vertex.h)
+        texture.h texture.cpp camera.cpp camera.h mesh.cpp mesh.h model.cpp model.h vertex.h material.h board.cpp board.h)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} GL GLU GLEW glfw3 Xxf86vm pthread Xrandr Xinerama Xi X11 Xcursor glad::glad assimp::assimp)
 

@@ -16,6 +16,7 @@ private:
     static void SetUniform(int loc, T v) { static_assert(true, ""); }
     static void SetUniform(int loc, int v);
     static void SetUniform(int loc, const std::vector<float> &v);
+    static void SetUniform(int loc, const glm::vec3 &v);
     static void SetUniform(int loc, glm::mat4 v);
 
 public:

@@ -18,6 +18,8 @@ private:
     std::string m_Type;
     unsigned char *m_LocalBuffer;
     int m_Width, m_Height, m_nChannels;
+
+    unsigned int getFormat() const;
 public:
     explicit Texture(const TextureSpec &spec);
     ~Texture();

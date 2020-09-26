@@ -12,6 +12,7 @@
 #include "renderer.h"
 #include "camera.h"
 #include "model.h"
+#include "board.h"
 
 #include <iostream>
 
@@ -45,19 +46,23 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
-//    Camera::Init(window);
+    Camera::Init(window);
 
     glEnable(GL_DEPTH_TEST);
 
-    Shader vertexShader("res/shaders/vertex.glsl");
-    Shader fragmentShader("res/shaders/fragment.glsl");
+    Shader vertexShader("res/shaders/material_vertex.glsl");
+    Shader fragmentShader("res/shaders/material_fragment.glsl");
 
     ShaderProgram shaderProgram(std::vector<Shader>{vertexShader, fragmentShader});
 
     shaderProgram.Use();
-    Model ourModel("res/objects/backpack/backpack.obj");
+//    Model ourModel("res/objects/backpack/backpack.obj");
+    Model board("res/objects/chess/board.obj");
+    Model pawn("res/objects/chess/pawn.obj");
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+    Board chessboard;
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
@@ -74,11 +79,20 @@ int main() {
 
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
-//        model = glm::translate(model,
-//                               glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-//        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));    // it's a bit too big for our scene, so scale it down
+        // translate it down so it's at the center of the scene
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        // it's a bit too big for our scene, so scale it down
+//        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+//        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+//        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         shaderProgram.SetUniform("model", model);
-        ourModel.Draw(shaderProgram);
+        board.Draw(shaderProgram);
+
+//        model = glm::translate(model, glm::vec3(0.0535f, 0.0515f, 0.0f));
+//        model = glm::translate(model, glm::vec3(0.0735f, 0.0715f, -0.0025f));
+        model = glm::translate(model, chessboard.GetCoordinates("f2"));
+        shaderProgram.SetUniform("model", model);
+        pawn.Draw(shaderProgram);
 
         // Swap front and back buffers
         glfwSwapBuffers(window);
@@ -92,7 +106,7 @@ int main() {
 }
 
 void initializeGLFW() {
-    /* Initialize the library */
+    // Initialize the library
     if (!glfwInit()) {
         spdlog::error("failed to initialize GLFW");
         exit(0);
@@ -123,7 +137,7 @@ void EnableGLDebug() {
 GLFWwindow *initializeWindow() {
     GLFWwindow *window;
 
-    /* Create a windowed mode window and its OpenGL context */
+    // Create a windowed mode window and its OpenGL context
     window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Chess club", nullptr, nullptr);
     if (!window) {
         spdlog::error("Failed to create GLFW window");
@@ -131,7 +145,7 @@ GLFWwindow *initializeWindow() {
         exit(1);
     }
 
-    /* Make the window's context current */
+    // Make the window's context current
     glfwMakeContextCurrent(window);
     // synchronize with vsync/refresh rate
     glfwSwapInterval(1);
@@ -149,4 +163,3 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     camera.ProcessMouseScroll((float) yoffset);
 }
-

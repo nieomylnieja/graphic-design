@@ -10,6 +10,7 @@
 #include "element_buffer.h"
 #include "vertex_buffer.h"
 #include "vertex_array.h"
+#include "material.h"
 
 class Mesh {
 public:
@@ -17,17 +18,25 @@ public:
     std::vector<unsigned int> m_Indices;
     std::vector<Texture> m_Textures;
 
+    Material m_Material;
+
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Material &material);
     ~Mesh();
 
     void Draw(ShaderProgram &shaderProgram);
 private:
+    bool m_IsMaterial;
+
     unsigned int vaox{};
     VertexArray vao{};
     VertexBuffer vbo{};
     ElementBuffer ebo{};
 
     void setupMesh();
+
+    void drawTexture(ShaderProgram &shaderProgram);
+    void drawMaterial(ShaderProgram &shaderProgram);
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <spdlog/spdlog.h>
+#include <fstream>
 #include "model.h"
 #include "lib/stb/stb_image.h"
 
@@ -24,6 +25,10 @@ void Model::loadModel(const std::string &path) {
         return;
     }
     directory = path.substr(0, path.find_last_of('/'));
+
+    if (std::ifstream(path.substr(0, path.find_last_of('.')) + ".mtl")) {
+        isMaterial = true;
+    }
 
     processNode(scene->mRootNode, scene);
 }
@@ -70,16 +75,22 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     // process materials
     aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 
-    std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE);
-    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-    std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR);
-    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-    std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT);
-    textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-    std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT);
-    textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+    if (isMaterial) {
+        Material mat = loadMaterial(material);
 
-    return Mesh(vertices, indices, textures);
+        return Mesh(vertices, indices, mat);
+    } else {
+        std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE);
+        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+        std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR);
+        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT);
+        textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+        std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT);
+        textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+
+        return Mesh(vertices, indices, textures);
+    }
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type) {
@@ -113,7 +124,7 @@ std::string Model::getNameFromTextureType(aiTextureType type) {
         case aiTextureType_HEIGHT:
             return "texture_height";
         case aiTextureType_AMBIENT:
-            return "texture_normal";
+            return "texture_ambient";
         default:
             spdlog::error("aiTextureType {} is not implemented", type);
             return "texture_unknown";
@@ -133,4 +144,24 @@ glm::vec2 Model::assimpToGlmVector(aiVector2t<ai_real> aiVec) {
     glmVec.x = aiVec.x;
     glmVec.y = aiVec.y;
     return glmVec;
+}
+
+Material Model::loadMaterial(aiMaterial *mat) {
+    Material material{};
+    aiColor3D color(0.f, 0.f, 0.f);
+    float shininess;
+
+    mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+    material.Diffuse = glm::vec3(color.r, color.b, color.g);
+
+    mat->Get(AI_MATKEY_COLOR_AMBIENT, color);
+    material.Ambient = glm::vec3(color.r, color.b, color.g);
+
+    mat->Get(AI_MATKEY_COLOR_SPECULAR, color);
+    material.Specular = glm::vec3(color.r, color.b, color.g);
+
+    mat->Get(AI_MATKEY_SHININESS, shininess);
+    material.Shininess = shininess;
+
+    return material;
 }

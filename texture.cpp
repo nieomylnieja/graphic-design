@@ -19,18 +19,7 @@ Texture::Texture(const TextureSpec &spec)
     // it acts as if it's stateful, I don't have time to investigate that, this is a safe way to reset anything in there
     stbi_set_flip_vertically_on_load(!spec.FlipImage);
 
-    GLuint format = 0;
-    switch (m_nChannels) {
-        case 1:
-            format = GL_RED;
-            break;
-        case 3:
-            format = GL_RGB;
-            break;
-        case 4:
-            format = GL_RGBA;
-            break;
-    }
+    unsigned int format = getFormat();
 
     glGenTextures(1, &m_ID);
     glBindTexture(GL_TEXTURE_2D, m_ID);
@@ -57,4 +46,18 @@ void Texture::Bind(unsigned int slot) const {
 
 void Texture::Unbind() {
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+unsigned int Texture::getFormat() const {
+    switch (m_nChannels) {
+        case 1:
+            return GL_RED;
+        case 3:
+            return GL_RGB;
+        case 4:
+            return GL_RGBA;
+        default:
+            spdlog::error("unsupported color format for {} channels", m_nChannels);
+            return 0;
+    }
 }

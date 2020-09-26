@@ -1,0 +1,12 @@
+# Blender MTL File: 'render-5.blend'
+# Material Count: 1
+
+newmtl Piece
+Ns 533.609994
+Ka 0.212500 0.127500 0.054000
+Kd 0.714000 0.428400 0.181440
+Ks 0.393548 0.271906 0.166721
+Ke 0.0 0.0 0.0
+Ni 1.450000
+d 1.000000
+illum 2

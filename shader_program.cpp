@@ -74,3 +74,7 @@ void ShaderProgram::SetUniform(const int loc, const std::vector<float> &v) {
 void ShaderProgram::SetUniform(int loc, glm::mat4 v) {
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(v));
 }
+
+void ShaderProgram::SetUniform(int loc, const glm::vec3 &v) {
+    glUniform3f(loc, v.x, v.y, v.z);
+}
