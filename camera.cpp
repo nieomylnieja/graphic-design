@@ -2,13 +2,13 @@
 #include "camera.h"
 
 // default values
-const float YAW = -90.0f;
-const float PITCH = 0.0f;
+const float YAW = 90.0f;
+const float PITCH = 00.0f;
 const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
 
-Camera::Camera(const unsigned int scrWidth, const unsigned int scrHeight) : m_Position({0.0f, 0.0f, 3.0f}),
+Camera::Camera(const unsigned int scrWidth, const unsigned int scrHeight) : m_Position({0.0f, 0.0f, -1.0f}),
                                                                             m_Front({0.0f, 0.0f, -1.0f}),
                                                                             m_WorldUp({0.0f, 1.0f, 0.0f}),
                                                                             m_DeltaTime(0.0f),

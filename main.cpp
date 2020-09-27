@@ -9,10 +9,9 @@
 #include "debug.h"
 #include "shader.h"
 #include "shader_program.h"
-#include "renderer.h"
 #include "camera.h"
 #include "model.h"
-#include "board.h"
+#include "chessboard.h"
 
 #include <iostream>
 
@@ -56,43 +55,25 @@ int main() {
     ShaderProgram shaderProgram(std::vector<Shader>{vertexShader, fragmentShader});
 
     shaderProgram.Use();
-//    Model ourModel("res/objects/backpack/backpack.obj");
-    Model board("res/objects/chess/board.obj");
-    Model pawn("res/objects/chess/pawn.obj");
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-    Board chessboard;
+    Chessboard chessboard(shaderProgram);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
         // Input here
         camera.ProcessKeyboardInput(window);
 
-        // Render here
-        Renderer::Clear();
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         shaderProgram.Use();
         // pass transformation matrices to the shader
         shaderProgram.SetUniform("projection", camera.GetProjection());
         shaderProgram.SetUniform("view", camera.GetView());
 
-        // render the loaded model
-        glm::mat4 model = glm::mat4(1.0f);
-        // translate it down so it's at the center of the scene
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        // it's a bit too big for our scene, so scale it down
-//        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-//        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-//        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        shaderProgram.SetUniform("model", model);
-        board.Draw(shaderProgram);
-
-//        model = glm::translate(model, glm::vec3(0.0535f, 0.0515f, 0.0f));
-//        model = glm::translate(model, glm::vec3(0.0735f, 0.0715f, -0.0025f));
-        model = glm::translate(model, chessboard.GetCoordinates("f2"));
-        shaderProgram.SetUniform("model", model);
-        pawn.Draw(shaderProgram);
+        // draw teh whole chess
+        chessboard.Draw(shaderProgram);
 
         // Swap front and back buffers
         glfwSwapBuffers(window);
